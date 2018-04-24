@@ -1,9 +1,32 @@
+apply plugin: 'java'
 
 description 'web3j Ethereum crypto library'
 
+repositories {
+    mavenCentral()
+}
+
+ext.jacksonVersion = '2.8.5'
+ext.slf4jVersion = '1.7.25'
+
+configurations {
+    // Extra configuration so the other module can declare a Gradle dependency
+    // on its “test” subset, using:
+    // testCompile project(path: ':web3j_crypto', configuration: 'archives')
+    archives
+}
+
 dependencies {
-    compile project(':rlp'),
-            project(':utils'),
+    compile project(':web3j_rlp'),
+            project(':web3j_utils'),
             "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
             "org.slf4j:slf4j-api:$slf4jVersion"
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+
+    // Extra configuration so the other module can declare a Gradle dependency
+    // on its “test” subset, using:
+    // testCompile project(path: ':unicashier', configuration: 'testOutput')
+    archives sourceSets.test.output
 }

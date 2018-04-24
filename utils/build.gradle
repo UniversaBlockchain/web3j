@@ -1,6 +1,15 @@
+apply plugin:'java'
 
 description 'Minimal set of web3j utility classes'
 
+ext.bouncycastleVersion = '1.54'
+
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile "org.bouncycastle:bcprov-jdk15on:$bouncycastleVersion"
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }

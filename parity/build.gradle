@@ -2,7 +2,7 @@
 description 'Parity JSON-RPC API'
 
 dependencies {
-    compile project(':core')
-    testCompile project(path: ':core', configuration: 'archives'),
+    compile project(':web3j_core')
+    testCompile project(path: ':web3j_core', configuration: 'archives'),
             "nl.jqno.equalsverifier:equalsverifier:$equalsverifierVersion"
 }

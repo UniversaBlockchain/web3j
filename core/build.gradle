@@ -1,17 +1,33 @@
+apply plugin: 'java'
+
 import java.text.SimpleDateFormat
 
 description 'web3j is a lightweight Java library for integration with Ethereum clients'
 
+repositories {
+    mavenCentral()
+}
+
+ext.jnr_unixsocketVersion = '0.15'
+ext.okhttpVersion = '3.8.1'
+ext.rxjavaVersion = '1.2.4'
+ext.equalsverifierVersion = '2.1.7'
+ext.mockitoVersion = '1.10.19'
+
 dependencies {
-    compile project(':abi'),
-            project(':crypto'),
-            project(':tuples'),
+    compile project(':web3j_abi'),
+            project(':web3j_crypto'),
+            project(':web3j_tuples'),
             "com.github.jnr:jnr-unixsocket:$jnr_unixsocketVersion",
             "com.squareup.okhttp3:okhttp:$okhttpVersion",
             "com.squareup.okhttp3:logging-interceptor:$okhttpVersion",
             "io.reactivex:rxjava:$rxjavaVersion"
-    testCompile project(path: ':crypto', configuration: 'archives'),
+    testCompile project(path: ':web3j_crypto', configuration: 'archives'),
             "nl.jqno.equalsverifier:equalsverifier:$equalsverifierVersion"
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile "org.mockito:mockito-core:$mockitoVersion"
 }
 
 task createProperties(dependsOn: processResources) doLast {
