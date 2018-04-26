@@ -1,17 +1,5 @@
 package org.web3j.protocol.rx;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.stream.Collectors;
-
-import rx.Observable;
-import rx.Scheduler;
-import rx.Subscriber;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.Subscriptions;
-
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -23,14 +11,25 @@ import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.utils.Observables;
+import rx.Observable;
+import rx.Scheduler;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.Subscriptions;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.stream.Collectors;
 
 /**
  * web3j reactive API implementation.
  */
 public class JsonRpc2_0Rx {
 
-    private final Web3j web3j;
-    private final ScheduledExecutorService scheduledExecutorService;
+    protected final Web3j web3j;
+    protected final ScheduledExecutorService scheduledExecutorService;
     private final Scheduler scheduler;
 
     public JsonRpc2_0Rx(Web3j web3j, ScheduledExecutorService scheduledExecutorService) {
@@ -66,7 +65,7 @@ public class JsonRpc2_0Rx {
         });
     }
 
-    private <T> void run(
+    protected <T> void run(
             org.web3j.protocol.core.filters.Filter<T> filter, Subscriber<? super T> subscriber,
             long pollingInterval) {
 
@@ -82,7 +81,11 @@ public class JsonRpc2_0Rx {
     public Observable<Transaction> pendingTransactionObservable(long pollingInterval) {
         return ethPendingTransactionHashObservable(pollingInterval)
                 .flatMap(transactionHash ->
-                        web3j.ethGetTransactionByHash(transactionHash).observable())
+                        // In case of null getting in, sending null out, to inform about exceptions.
+                        (transactionHash == null || transactionHash.isEmpty()) ?
+//                                Observable.empty() :
+                                Observable.just(null):
+                                web3j.ethGetTransactionByHash(transactionHash).observable())
                 .map(ethTransaction -> ethTransaction.getTransaction().get());
     }
 
@@ -90,7 +93,11 @@ public class JsonRpc2_0Rx {
             boolean fullTransactionObjects, long pollingInterval) {
         return ethBlockHashObservable(pollingInterval)
                 .flatMap(blockHash ->
-                        web3j.ethGetBlockByHash(blockHash, fullTransactionObjects).observable());
+                        // In case of null getting in, sending null out, to inform about exceptions.
+                        (blockHash == null || blockHash.isEmpty()) ?
+                                Observable.just(null):
+//                                Observable.empty() :
+                                web3j.ethGetBlockByHash(blockHash, fullTransactionObjects).observable());
     }
 
     public Observable<EthBlock> replayBlocksObservable(

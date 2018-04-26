@@ -1,5 +1,14 @@
 package org.web3j.protocol.core.filters;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.Request;
+import org.web3j.protocol.core.Response;
+import org.web3j.protocol.core.methods.response.EthFilter;
+import org.web3j.protocol.core.methods.response.EthLog;
+import org.web3j.protocol.core.methods.response.EthUninstallFilter;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -8,17 +17,6 @@ import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.web3j.protocol.Web3j;
-
-import org.web3j.protocol.core.Request;
-import org.web3j.protocol.core.Response;
-import org.web3j.protocol.core.methods.response.EthFilter;
-import org.web3j.protocol.core.methods.response.EthLog;
-import org.web3j.protocol.core.methods.response.EthUninstallFilter;
 
 
 /**
@@ -29,11 +27,13 @@ public abstract class Filter<T> {
     private static final Logger log = LoggerFactory.getLogger(Filter.class);
 
     final Web3j web3j;
-    final Callback<T> callback;
+    protected final Callback<T> callback;
 
-    private volatile BigInteger filterId;
+    protected volatile BigInteger filterId;
 
     private ScheduledFuture<?> schedule;
+
+    private static volatile int filterNum = 0;
 
     public Filter(Web3j web3j, Callback<T> callback) {
         this.web3j = web3j;
@@ -70,18 +70,24 @@ public abstract class Filter<T> {
             which isn't ideal given the aforementioned issues.
             */
             schedule = scheduledExecutorService.scheduleAtFixedRate(
-                    () -> {
-                        try {
-                            this.pollFilter(ethFilter);
-                        } catch (Throwable e) {
-                            // All exceptions must be caught, otherwise our job terminates without
-                            // any notification
-                            log.error("Error sending request", e);
-                        }
-                    },
+                    () -> scheduledPoll(ethFilter),
                     0, blockTime, TimeUnit.MILLISECONDS);
         } catch (IOException e) {
             throwException(e);
+        }
+    }
+
+    /**
+     * Perform the poll of the filter on every scheduled execution.
+     */
+    protected void scheduledPoll(EthFilter ethFilter) {
+        try {
+            assert ethFilter != null;
+            pollFilter(ethFilter);
+        } catch (Throwable e) {
+            // All exceptions must be caught, otherwise our job terminates without
+            // any notification
+            log.error("Error sending request", e);
         }
     }
 
@@ -95,16 +101,20 @@ public abstract class Filter<T> {
                 ethLog = new EthLog();
                 ethLog.setResult(Collections.emptyList());
             }
-            process(ethLog.getLogs());
+            final List<EthLog.LogResult> logs = ethLog.getLogs();
+            if (!logs.isEmpty()) {
+                process(logs);
+            }
 
         } catch (IOException e) {
             throwException(e);
         }
     }
 
-    private void pollFilter(EthFilter ethFilter) {
+    public void pollFilter(EthFilter ethFilter) {
         EthLog ethLog = null;
         try {
+            assert ethFilter != null;
             ethLog = web3j.ethGetFilterChanges(filterId).send();
         } catch (IOException e) {
             throwException(e);
@@ -112,13 +122,16 @@ public abstract class Filter<T> {
         if (ethLog.hasError()) {
             throwException(ethLog.getError());
         } else {
-            process(ethLog.getLogs());
+            final List<EthLog.LogResult> logs = ethLog.getLogs();
+            if (!logs.isEmpty()) {
+                process(logs);
+            }
         }
     }
 
-    abstract EthFilter sendRequest() throws IOException;
+    protected abstract EthFilter sendRequest() throws IOException;
 
-    abstract void process(List<EthLog.LogResult> logResults);
+    protected abstract void process(List<EthLog.LogResult> logResults);
 
     public void cancel() {
         schedule.cancel(false);
@@ -147,12 +160,12 @@ public abstract class Filter<T> {
      */
     protected abstract Optional<Request<?, EthLog>> getFilterLogs(BigInteger filterId);
 
-    void throwException(Response.Error error) {
+    public void throwException(Response.Error error) {
         throw new FilterException("Invalid request: "
                 + (error == null ? "Unknown Error" : error.getMessage()));
     }
 
-    void throwException(Throwable cause) {
+    public void throwException(Throwable cause) {
         throw new FilterException("Error sending request", cause);
     }
 }

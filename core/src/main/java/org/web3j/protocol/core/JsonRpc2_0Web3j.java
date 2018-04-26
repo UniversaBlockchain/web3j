@@ -1,69 +1,21 @@
 package org.web3j.protocol.core;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.concurrent.ScheduledExecutorService;
-
-import rx.Observable;
-
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.methods.request.ShhFilter;
 import org.web3j.protocol.core.methods.request.ShhPost;
 import org.web3j.protocol.core.methods.request.Transaction;
-import org.web3j.protocol.core.methods.response.DbGetHex;
-import org.web3j.protocol.core.methods.response.DbGetString;
-import org.web3j.protocol.core.methods.response.DbPutHex;
-import org.web3j.protocol.core.methods.response.DbPutString;
-import org.web3j.protocol.core.methods.response.EthAccounts;
-import org.web3j.protocol.core.methods.response.EthBlock;
-import org.web3j.protocol.core.methods.response.EthBlockNumber;
-import org.web3j.protocol.core.methods.response.EthCoinbase;
-import org.web3j.protocol.core.methods.response.EthCompileLLL;
-import org.web3j.protocol.core.methods.response.EthCompileSerpent;
-import org.web3j.protocol.core.methods.response.EthCompileSolidity;
-import org.web3j.protocol.core.methods.response.EthEstimateGas;
-import org.web3j.protocol.core.methods.response.EthFilter;
-import org.web3j.protocol.core.methods.response.EthGasPrice;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
-import org.web3j.protocol.core.methods.response.EthGetBlockTransactionCountByHash;
-import org.web3j.protocol.core.methods.response.EthGetBlockTransactionCountByNumber;
-import org.web3j.protocol.core.methods.response.EthGetCode;
-import org.web3j.protocol.core.methods.response.EthGetCompilers;
-import org.web3j.protocol.core.methods.response.EthGetStorageAt;
-import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
-import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
-import org.web3j.protocol.core.methods.response.EthGetUncleCountByBlockHash;
-import org.web3j.protocol.core.methods.response.EthGetUncleCountByBlockNumber;
-import org.web3j.protocol.core.methods.response.EthGetWork;
-import org.web3j.protocol.core.methods.response.EthHashrate;
-import org.web3j.protocol.core.methods.response.EthLog;
-import org.web3j.protocol.core.methods.response.EthMining;
-import org.web3j.protocol.core.methods.response.EthProtocolVersion;
-import org.web3j.protocol.core.methods.response.EthSign;
-import org.web3j.protocol.core.methods.response.EthSubmitHashrate;
-import org.web3j.protocol.core.methods.response.EthSubmitWork;
-import org.web3j.protocol.core.methods.response.EthSyncing;
-import org.web3j.protocol.core.methods.response.EthTransaction;
-import org.web3j.protocol.core.methods.response.EthUninstallFilter;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.protocol.core.methods.response.NetListening;
-import org.web3j.protocol.core.methods.response.NetPeerCount;
-import org.web3j.protocol.core.methods.response.NetVersion;
-import org.web3j.protocol.core.methods.response.ShhAddToGroup;
-import org.web3j.protocol.core.methods.response.ShhHasIdentity;
-import org.web3j.protocol.core.methods.response.ShhMessages;
-import org.web3j.protocol.core.methods.response.ShhNewFilter;
-import org.web3j.protocol.core.methods.response.ShhNewGroup;
-import org.web3j.protocol.core.methods.response.ShhNewIdentity;
-import org.web3j.protocol.core.methods.response.ShhUninstallFilter;
-import org.web3j.protocol.core.methods.response.ShhVersion;
-import org.web3j.protocol.core.methods.response.Web3ClientVersion;
-import org.web3j.protocol.core.methods.response.Web3Sha3;
+import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.rx.JsonRpc2_0Rx;
 import org.web3j.utils.Async;
 import org.web3j.utils.Numeric;
+import rx.Observable;
+
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Function;
 
 /**
  * JSON-RPC 2.0 factory implementation.
@@ -73,19 +25,32 @@ public class JsonRpc2_0Web3j implements Web3j {
     public static final int DEFAULT_BLOCK_TIME = 15 * 1000;
 
     protected final Web3jService web3jService;
-    private final JsonRpc2_0Rx web3jRx;
-    private final long blockTime;
+    protected final JsonRpc2_0Rx web3jRx;
+    protected final long blockTime;
 
     public JsonRpc2_0Web3j(Web3jService web3jService) {
         this(web3jService, DEFAULT_BLOCK_TIME, Async.defaultExecutorService());
     }
 
     public JsonRpc2_0Web3j(
-            Web3jService web3jService, long pollingInterval,
+            Web3jService web3jService,
+            long pollingInterval,
             ScheduledExecutorService scheduledExecutorService) {
+        this(web3jService, pollingInterval, web3j -> new JsonRpc2_0Rx(web3j, scheduledExecutorService));
+    }
+
+    /**
+     * A special constructor that can generate {@link #web3jRx} variable (of {@link JsonRpc2_0Rx} type)
+     * by any custom generator.
+     */
+    protected JsonRpc2_0Web3j(
+            Web3jService web3jService,
+            long pollingInterval,
+            Function<Web3j, JsonRpc2_0Rx> web3jRxGenerator
+    ) {
         this.web3jService = web3jService;
-        this.web3jRx = new JsonRpc2_0Rx(this, scheduledExecutorService);
         this.blockTime = pollingInterval;
+        this.web3jRx = web3jRxGenerator.apply(this);
     }
 
     @Override
@@ -298,7 +263,7 @@ public class JsonRpc2_0Web3j implements Web3j {
 
     @Override
     public Request<?, org.web3j.protocol.core.methods.response.EthSendTransaction>
-            ethSendTransaction(
+    ethSendTransaction(
             Transaction transaction) {
         return new Request<>(
                 "eth_sendTransaction",
@@ -309,7 +274,7 @@ public class JsonRpc2_0Web3j implements Web3j {
 
     @Override
     public Request<?, org.web3j.protocol.core.methods.response.EthSendTransaction>
-            ethSendRawTransaction(
+    ethSendRawTransaction(
             String signedTransactionData) {
         return new Request<>(
                 "eth_sendRawTransaction",
@@ -702,13 +667,13 @@ public class JsonRpc2_0Web3j implements Web3j {
 
     @Override
     public Observable<org.web3j.protocol.core.methods.response.Transaction>
-            transactionObservable() {
+    transactionObservable() {
         return web3jRx.transactionObservable(blockTime);
     }
 
     @Override
     public Observable<org.web3j.protocol.core.methods.response.Transaction>
-            pendingTransactionObservable() {
+    pendingTransactionObservable() {
         return web3jRx.pendingTransactionObservable(blockTime);
     }
 
@@ -734,7 +699,7 @@ public class JsonRpc2_0Web3j implements Web3j {
 
     @Override
     public Observable<org.web3j.protocol.core.methods.response.Transaction>
-            replayTransactionsObservable(
+    replayTransactionsObservable(
             DefaultBlockParameter startBlock, DefaultBlockParameter endBlock) {
         return web3jRx.replayTransactionsObservable(startBlock, endBlock);
     }
@@ -755,7 +720,7 @@ public class JsonRpc2_0Web3j implements Web3j {
 
     @Override
     public Observable<org.web3j.protocol.core.methods.response.Transaction>
-            catchUpToLatestTransactionObservable(DefaultBlockParameter startBlock) {
+    catchUpToLatestTransactionObservable(DefaultBlockParameter startBlock) {
         return web3jRx.catchUpToLatestTransactionObservable(startBlock);
     }
 
@@ -768,7 +733,7 @@ public class JsonRpc2_0Web3j implements Web3j {
 
     @Override
     public Observable<org.web3j.protocol.core.methods.response.Transaction>
-            catchUpToLatestAndSubscribeToNewTransactionsObservable(
+    catchUpToLatestAndSubscribeToNewTransactionsObservable(
             DefaultBlockParameter startBlock) {
         return web3jRx.catchUpToLatestAndSubscribeToNewTransactionsObservable(
                 startBlock, blockTime);
