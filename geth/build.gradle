@@ -1,7 +1,14 @@
+apply plugin: 'java'
 
 description 'Geth JSON-RPC API'
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile project(':web3j_core')
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile project(path: ':web3j_core', configuration: 'archives')
 }

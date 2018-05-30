@@ -7,6 +7,7 @@ import org.web3j.protocol.admin.methods.response.PersonalSign;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.geth.response.PersonalEcRecover;
 import org.web3j.protocol.geth.response.PersonalImportRawKey;
+import org.web3j.protocol.geth.response.TxpoolContent;
 
 /**
  * JSON-RPC Request object building factory for Geth. 
@@ -23,5 +24,6 @@ public interface Geth extends Admin {
     public Request<?, PersonalSign> personalSign(String message, String accountId, String password);
     
     public Request<?, PersonalEcRecover> personalEcRecover(String message, String signiture);
-    
+
+    public Request<?, TxpoolContent> txpoolContent();
 }

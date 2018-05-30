@@ -1,6 +1,7 @@
 package org.web3j.protocol.geth;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.admin.JsonRpc2_0Admin;
@@ -9,6 +10,7 @@ import org.web3j.protocol.admin.methods.response.PersonalSign;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.geth.response.PersonalEcRecover;
 import org.web3j.protocol.geth.response.PersonalImportRawKey;
+import org.web3j.protocol.geth.response.TxpoolContent;
 
 /**
  * JSON-RPC 2.0 factory implementation for Geth.
@@ -56,6 +58,14 @@ class JsonRpc2_0Geth extends JsonRpc2_0Admin implements Geth {
                 Arrays.asList(hexMessage,signedMessage),
                 web3jService,
                 PersonalEcRecover.class);
-    } 
-    
+    }
+
+    @Override
+    public Request<?, TxpoolContent> txpoolContent() {
+        return new Request<>(
+                "txpool_content",
+                Collections.<String>emptyList(),
+                web3jService,
+                TxpoolContent.class);
+    }
 }
