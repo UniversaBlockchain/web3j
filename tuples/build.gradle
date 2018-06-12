@@ -1,3 +1,6 @@
 apply plugin:'java'
 
 description 'Simple Java tuples library'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8

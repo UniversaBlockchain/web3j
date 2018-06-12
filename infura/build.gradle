@@ -1,6 +1,9 @@
 
 description 'web3j customisations for working with Infura.io'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 dependencies {
     compile project(':web3j_core')
 }

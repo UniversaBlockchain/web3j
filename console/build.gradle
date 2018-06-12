@@ -3,6 +3,9 @@ apply plugin: 'application'
 
 description 'web3j command line tools'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 dependencies {
     compile project(':web3j_codegen'),
             project(':web3j_infura')

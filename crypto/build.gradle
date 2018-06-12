@@ -2,6 +2,9 @@ apply plugin: 'java'
 
 description 'web3j Ethereum crypto library'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 repositories {
     mavenCentral()
 }

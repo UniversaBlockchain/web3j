@@ -2,6 +2,9 @@ apply plugin:'java'
 
 description 'web3j project code generators'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 dependencies {
     compile project(':web3j_core'),
             "com.squareup:javapoet:$javapoetVersion"

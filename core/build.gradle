@@ -4,6 +4,9 @@ import java.text.SimpleDateFormat
 
 description 'web3j is a lightweight Java library for integration with Ethereum clients'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 repositories {
     mavenCentral()
 }

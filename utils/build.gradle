@@ -2,6 +2,9 @@ apply plugin:'java'
 
 description 'Minimal set of web3j utility classes'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 ext.bouncycastleVersion = '1.54'
 
 repositories {

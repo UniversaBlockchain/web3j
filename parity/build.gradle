@@ -1,6 +1,9 @@
 
 description 'Parity JSON-RPC API'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 dependencies {
     compile project(':web3j_core')
     testCompile project(path: ':web3j_core', configuration: 'archives'),
