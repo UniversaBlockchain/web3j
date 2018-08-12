@@ -20,19 +20,19 @@ ext.mockitoVersion = '1.10.19'
 configurations {
     // Extra configuration so the other module can declare a Gradle dependency
     // on its “test” subset, using:
-    // testCompile project(path: ':web3j_core', configuration: 'archives')
+    // testCompile project(path: ':core', configuration: 'archives')
     archives
 }
 
 dependencies {
-    compile project(':web3j_abi'),
-            project(':web3j_crypto'),
-            project(':web3j_tuples'),
+    compile project(':abi'),
+            project(':crypto'),
+            project(':tuples'),
             "com.github.jnr:jnr-unixsocket:$jnr_unixsocketVersion",
             "com.squareup.okhttp3:okhttp:$okhttpVersion",
             "com.squareup.okhttp3:logging-interceptor:$okhttpVersion",
             "io.reactivex:rxjava:$rxjavaVersion"
-    testCompile project(path: ':web3j_crypto', configuration: 'archives'),
+    testCompile project(path: ':crypto', configuration: 'archives'),
             "nl.jqno.equalsverifier:equalsverifier:$equalsverifierVersion"
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -41,7 +41,7 @@ dependencies {
 
     // Extra configuration so the other module can declare a Gradle dependency
     // on its “test” subset, using:
-    // testCompile project(path: ':web3j_core', configuration: 'archives')
+    // testCompile project(path: ':core', configuration: 'archives')
     archives sourceSets.test.output
 }
 

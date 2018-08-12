@@ -28,9 +28,6 @@ plugins {
     id "com.jfrog.bintray" version "1.7.3"
 }
 
-group 'web3j'
-version '3.3.1'
-
 apply plugin: 'java'
 apply plugin: 'idea'
 // should only be applied to the root project, see
@@ -38,7 +35,7 @@ apply plugin: 'idea'
 apply plugin: 'io.codearte.nexus-staging'
 apply plugin: 'jacoco'
 
-description 'web3j base project'
+description 'web3j base project - forked for Universa enhanced expandability'
 
 allprojects {
 
@@ -129,6 +126,8 @@ configure(subprojects.findAll {it.name != 'integration-tests'}) {
     publishing {
         publications {
             mavenJava(MavenPublication) {
+                groupId 'com.icodici.web3j'
+                version '3.3.1.20180812165200'
                 from components.java
 
                 artifact sourcesJar {
@@ -137,6 +136,15 @@ configure(subprojects.findAll {it.name != 'integration-tests'}) {
 
                 artifact testJar {
                     classifier 'tests'
+                }
+            }
+        }
+        repositories {
+            maven {
+                url = "https://maven.universa.io/"
+                credentials {
+                    username System.getProperty("user")
+                    password System.getProperty("password")
                 }
             }
         }
@@ -223,7 +231,7 @@ task jacocoRootTestReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
     dependsOn = subprojects.test
     additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
     sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
-    classDirectories =  files(subprojects.sourceSets.main.output)
+    classDirectories = files(subprojects.sourceSets.main.output)
     executionData = files(subprojects.jacocoTestReport.executionData)
     reports {
         xml.enabled = true

@@ -15,13 +15,13 @@ ext.slf4jVersion = '1.7.25'
 configurations {
     // Extra configuration so the other module can declare a Gradle dependency
     // on its “test” subset, using:
-    // testCompile project(path: ':web3j_crypto', configuration: 'archives')
+    // testCompile project(path: ':crypto', configuration: 'archives')
     archives
 }
 
 dependencies {
-    compile project(':web3j_rlp'),
-            project(':web3j_utils'),
+    compile project(':rlp'),
+            project(':utils'),
             "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
             "org.slf4j:slf4j-api:$slf4jVersion"
 

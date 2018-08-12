@@ -6,6 +6,6 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile project(':web3j_core'),
+    compile project(':core'),
             "com.squareup:javapoet:$javapoetVersion"
 }

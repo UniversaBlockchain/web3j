@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    compile project(':web3j_core')
+    compile project(':core')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile project(path: ':web3j_core', configuration: 'archives')
+    testCompile project(path: ':core', configuration: 'archives')
 }

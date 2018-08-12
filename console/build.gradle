@@ -7,11 +7,11 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile project(':web3j_codegen'),
-            project(':web3j_infura')
+    compile project(':codegen'),
+            project(':infura')
     runtime "org.slf4j:slf4j-nop:$slf4jVersion"  // prevent logging of the library to the console
-    testCompile project(path: ':web3j_crypto', configuration: 'archives'),
-            project(path: ':web3j_core', configuration: 'archives')
+    testCompile project(path: ':crypto', configuration: 'archives'),
+            project(path: ':core', configuration: 'archives')
 }
 
 // Build command line library release with target distShadowZip

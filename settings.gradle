@@ -1,26 +1,14 @@
 rootProject.name = 'base'
 
-include ':web3j_abi'
-project(':web3j_abi').projectDir = new File(settingsDir, './abi')
-include ':web3j_codegen'
-project(':web3j_codegen').projectDir = new File(settingsDir, './codegen')
-include ':web3j_console'
-project(':web3j_console').projectDir = new File(settingsDir, './console')
-include ':web3j_core'
-project(':web3j_core').projectDir = new File(settingsDir, './core')
-include ':web3j_crypto'
-project(':web3j_crypto').projectDir = new File(settingsDir, './crypto')
-include ':web3j_geth'
-project(':web3j_geth').projectDir = new File(settingsDir, './geth')
-include ':web3j_infura'
-project(':web3j_infura').projectDir = new File(settingsDir, './infura')
-include ':web3j_integration'
-project(':web3j_integration').projectDir = new File(settingsDir, './integration')
-include ':web3j_parity'
-project(':web3j_parity').projectDir = new File(settingsDir, './parity')
-include ':web3j_rlp'
-project(':web3j_rlp').projectDir = new File(settingsDir, './rlp')
-include ':web3j_tuples'
-project(':web3j_tuples').projectDir = new File(settingsDir, './tuples')
-include ':web3j_utils'
-project(':web3j_utils').projectDir = new File(settingsDir, './utils')
+include 'abi'
+include 'codegen'
+include 'console'
+include 'core'
+include 'crypto'
+include 'geth'
+include 'infura'
+include 'integration-tests'
+include 'parity'
+include 'rlp'
+include 'tuples'
+include 'utils'
