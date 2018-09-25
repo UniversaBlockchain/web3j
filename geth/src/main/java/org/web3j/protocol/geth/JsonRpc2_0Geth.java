@@ -11,6 +11,7 @@ import org.web3j.protocol.core.Request;
 import org.web3j.protocol.geth.response.PersonalEcRecover;
 import org.web3j.protocol.geth.response.PersonalImportRawKey;
 import org.web3j.protocol.geth.response.TxpoolContent;
+import org.web3j.protocol.geth.response.TxpoolContentETC;
 
 /**
  * JSON-RPC 2.0 factory implementation for Geth.
@@ -67,5 +68,14 @@ class JsonRpc2_0Geth extends JsonRpc2_0Admin implements Geth {
                 Collections.<String>emptyList(),
                 web3jService,
                 TxpoolContent.class);
+    }
+
+    @Override
+    public Request<?, TxpoolContentETC> txpoolContentETC() {
+        return new Request<>(
+                "txpool_content",
+                Collections.<String>emptyList(),
+                web3jService,
+                TxpoolContentETC.class);
     }
 }

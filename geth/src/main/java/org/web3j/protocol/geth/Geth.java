@@ -8,6 +8,7 @@ import org.web3j.protocol.core.Request;
 import org.web3j.protocol.geth.response.PersonalEcRecover;
 import org.web3j.protocol.geth.response.PersonalImportRawKey;
 import org.web3j.protocol.geth.response.TxpoolContent;
+import org.web3j.protocol.geth.response.TxpoolContentETC;
 
 /**
  * JSON-RPC Request object building factory for Geth. 
@@ -25,5 +26,13 @@ public interface Geth extends Admin {
     
     public Request<?, PersonalEcRecover> personalEcRecover(String message, String signiture);
 
+    /**
+     * Call <code>txpool_content</code> geth-specific method; compatible with primary Ethereum network.
+     */
     public Request<?, TxpoolContent> txpoolContent();
+
+    /**
+     * Call <code>txpool_content</code> geth-specific method; compatible with Ethereum Classic network.
+     */
+    public Request<?, TxpoolContentETC> txpoolContentETC();
 }

@@ -5,32 +5,41 @@ import org.web3j.protocol.core.methods.response.Transaction;
 
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
- * txpool_content (Ethereum network).
+ * txpool_content (Ethereum Classic network).
  * <p>
  * Note that only <code>pending</code> field is parsed; <code>queued</code> is ignored for now.
  */
-public class TxpoolContent extends Response<TxpoolContent.Result> {
+public class TxpoolContentETC extends Response<TxpoolContentETC.Result> {
 
     public static class Result {
 
-        private Map<String, Map<BigInteger, Transaction>> pending;
+        private Map<String, Map<BigInteger, List<Transaction>>> pending;
 
         public Result() {
         }
 
-        public Result(Map<String, Map<BigInteger, Transaction>> pending) {
+        public Result(Map<String, Map<BigInteger, List<Transaction>>> pending) {
             this.pending = Collections.unmodifiableMap(
                     pending.entrySet()
                             .stream()
                             .collect(Collectors.toMap(
-                                    (Map.Entry<String, Map<BigInteger, Transaction>> e) ->
+                                    (Map.Entry<String, Map<BigInteger, List<Transaction>>> e) ->
                                             e.getKey().toLowerCase(),
-                                    (Map.Entry<String, Map<BigInteger, Transaction>> e) ->
-                                            Collections.unmodifiableMap(e.getValue())
+                                    (Map.Entry<String, Map<BigInteger, List<Transaction>>> e) ->
+                                            Collections.unmodifiableMap(e.getValue().entrySet()
+                                                    .stream()
+                                                    .collect(Collectors.toMap(
+                                                            (Map.Entry<BigInteger, List<Transaction>> e1) ->
+                                                                    e1.getKey(),
+                                                            (Map.Entry<BigInteger, List<Transaction>> e1) ->
+                                                                    Collections.unmodifiableList(e1.getValue())
+                                                    )))
                             ))
             );
         }
@@ -43,7 +52,7 @@ public class TxpoolContent extends Response<TxpoolContent.Result> {
                 return false;
             } else {
                 Result that = (Result) o;
-                final Map<String, Map<BigInteger, Transaction>>
+                final Map<String, Map<BigInteger, List<Transaction>>>
                         thisPending = this.getPending(),
                         thatPending = that.getPending();
                 return (true &&
@@ -53,7 +62,7 @@ public class TxpoolContent extends Response<TxpoolContent.Result> {
                         // the nonces and transactions match.
                         thisPending.entrySet().stream().allMatch(e -> {
                             final String thisFrom = e.getKey();
-                            final Map<BigInteger, Transaction>
+                            final Map<BigInteger, List<Transaction>>
                                     thisMapForFrom = e.getValue(),
                                     thatMapForFrom = thatPending.get(thisFrom);
                             return (true &&
@@ -61,11 +70,19 @@ public class TxpoolContent extends Response<TxpoolContent.Result> {
                                     // On "this" and on "that" side, we have matching sets of nonces.
                                     thisMapForFrom.keySet().equals(thatMapForFrom.keySet()) &&
                                     // On "this" and on "that" side, for the specified "from" value,
-                                    // we have matching nonce-to-transaction maps.
+                                    // we have matching nonce-to-transaction-list maps.
                                     thisMapForFrom.entrySet()
                                             .stream()
-                                            .allMatch((Map.Entry<BigInteger, Transaction> e2) ->
-                                                    e2.getValue().equals(thatMapForFrom.get(e2.getKey()))
+                                            .allMatch((Map.Entry<BigInteger, List<Transaction>> e2) -> {
+                                                        final List<Transaction>
+                                                                thisList = e2.getValue(),
+                                                                thatList = thatMapForFrom.get(e2.getKey());
+                                                        return (true &&
+                                                                thisList.size() == thatList.size() &&
+                                                                IntStream.range(0, thisList.size()).allMatch(
+                                                                        i -> thisList.get(i).equals(thatList.get(i))
+                                                                ));
+                                                    }
                                             )
                             );
                         })
@@ -88,14 +105,14 @@ public class TxpoolContent extends Response<TxpoolContent.Result> {
          * The second map is grouped by (has keys) the nonce fields of transactions;
          * and the value for each key is the list of transactions themselves.
          */
-        public Map<String, Map<BigInteger, Transaction>> getPending() {
+        public Map<String, Map<BigInteger, List<Transaction>>> getPending() {
             return pending;
         }
     }
 
-    public TxpoolContent.Result getTxpoolContent() {
+    public TxpoolContentETC.Result getTxpoolContentETC() {
         final Result rawResult = getResult();
-        assert rawResult != null : "Could not parse JSON to TxpoolContent class";
+        assert rawResult != null : "Could not parse JSON to TxpoolContentETC class";
         return new Result(rawResult.pending);
     }
 }
