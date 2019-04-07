@@ -299,7 +299,10 @@ public class ResponseTest extends ResponseTester {
                 + "            \"transactionIndex\": null,\n"
                 + "            \"value\": \"0xde0b6b3a7640000\",\n"
                 + "            \"replayProtected\": true,\n"
-                + "            \"chainId\": 61\n"
+                + "            \"chainId\": 61,\n"
+                + "            \"v\": null,\n"
+                + "            \"r\": null,\n"
+                + "            \"s\": null\n"
                 + "          }\n"
                 + "        ]\n"
                 + "      },\n" // 0x6e7da5de5dfab61df2746b7d8fabbe779fb948e5
