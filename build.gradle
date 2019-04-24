@@ -127,7 +127,7 @@ configure(subprojects.findAll {it.name != 'integration-tests'}) {
         publications {
             mavenJava(MavenPublication) {
                 groupId 'com.icodici.web3j'
-                version '3.3.1.20190310153000'
+                version '3.3.1.20190424133900'
                 from components.java
 
                 artifact sourcesJar {
